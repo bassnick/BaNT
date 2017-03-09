@@ -3,6 +3,7 @@ package cz.bassnick.testa;
 import android.location.Address;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -112,24 +113,44 @@ public class MainActivity extends AppCompatActivity {
 
     //z9UpxHtDErFMCiPGZCDFRE0qBc3f9jD9ZApWn53w
     public void GetCount(View view) {
+        MakeGPSView();
         // example BoundingBox
         // POST https://api.munzee.com/map/boundingbox/
         // 'data={"exclude":"own","limit":3,"fields":"munzee_id,friendly_name,latitude,longitude,original_pin_image,proximity_radius_ft,creator_username", "points":{"box1":{"timestamp": 1304554511,"lat2":50.85229979649992,"lng1":12.919996137208939,"lng2":12.92009802365303,"lat1":50.84729979649992}}}'
+        TextView tvLat = (TextView) findViewById(R.id.tvLat);
+        TextView tvLong = (TextView) findViewById(R.id.tvLong);
+        double ilat = Double.parseDouble(tvLat.getText().toString());
+        double iLong = Double.parseDouble(tvLong.getText().toString());
 
-        // example GetMunzeeById
+        double lat1 = ilat - 0.0058578;
+        double lat2 = ilat + 0.0058578;
+        double lng1 = iLong - 0.0096317;
+        double lng2 = iLong + 0.0096317;
+
+        String requestData1 = "data";
+        String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id,friendly_name,latitude,longitude,original_pin_image,creator_username\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
+
+        //0.0058578NS
+        //0,0096317WE
+
+        // / example GetMunzeeById
         // POST https://api.munzee.com/munzee/
         //'data={"munzee_id":100, "closest":1}'
 
 
         ((TextView) (findViewById(R.id.tvCountMunzee))).setText("xxx");
         ((TextView) (findViewById(R.id.tvCountSpecial))).setText("yyy");
-        MakeGPSView();
         PostTask p = new PostTask();
+        p.parametr = requestData2;
         AsyncTask<String, String, String> result = p.execute(null,null,null);
 
 
     }
     private class PostTask extends AsyncTask<String, String, String> {
+        public String parametr;
+        private int numberOfMunzees;
+        private int numberOfSpecials;
+
         @Override
         protected String doInBackground(String... data) {
             try {
@@ -137,9 +158,10 @@ public class MainActivity extends AppCompatActivity {
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
                 String token = "KiJvZ85biNSZ7R8bR6BkbSdyvtiWfYv8pHL2HX3g";
                 HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("https://api.munzee.com/user/");
+                HttpPost httppost = new HttpPost("https://api.munzee.com/map/boundingbox/");
                 httppost.setHeader("Authorization", "Bearer " + token);
-                nameValuePairs.add(new BasicNameValuePair("data", "{\"username\":\"coolant\"}"));
+                //nameValuePairs.add(new BasicNameValuePair("data", "{\"username\":\"coolant\"}"));
+                nameValuePairs.add(new BasicNameValuePair("data", parametr));
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 //execute http post
                 HttpResponse response = httpclient.execute(httppost);
@@ -159,7 +181,44 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result)
         {
             // todo
-            ((TextView) (findViewById(R.id.tvCountMunzee))).setText(result.substring(0,20));
+            analyzeResult(result);
+
+            ((TextView) (findViewById(R.id.tvCountMunzee))).setText(String.valueOf(numberOfMunzees));
+            ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(numberOfSpecials));
+
+        }
+        private void analyzeResult(String result)
+        {
+            numberOfMunzees = 0;
+            numberOfSpecials = 0;
+            int start = result.indexOf('[',0);
+            int startPoleMunzee =result.indexOf('[',start + 1);
+            int endPoleMunzee = result.indexOf(']', startPoleMunzee + 1);
+            String poleMunzee = result.substring(startPoleMunzee, endPoleMunzee);
+            String[] jednotliveMunzee = poleMunzee.split("\\}");
+            if (jednotliveMunzee == null || jednotliveMunzee.length == 0)
+            {
+                return;
+            }
+            numberOfMunzees = jednotliveMunzee.length;
+            for (int i = 0; i < jednotliveMunzee.length; i++)
+            {
+                /*
+                "munzee_id": "830366",
+                "friendly_name": "Schönherrpark #3",
+                "latitude": "50.8497691154465",
+                "longitude": "12.9200291633602",
+                "original_pin_image": "http://static.munzee.com/images/pins/munzee.png",
+                "creator_username": "BHaus"
+                */
+                int startMID = jednotliveMunzee[i].indexOf("\"munzee_id\":");
+                int endMID = jednotliveMunzee[i].indexOf(",", startMID);
+                String MID = jednotliveMunzee[i].substring(startMID, endMID);
+                String ID = MID.split("\\:")[1];
+                ID = ID.trim().replaceAll("\"", "");
+                // todo -> volani funkce na zjisteni jestli hosti specialku
+            }
+
         }
     }
 }
