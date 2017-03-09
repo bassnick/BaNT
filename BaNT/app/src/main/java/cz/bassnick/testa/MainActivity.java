@@ -34,6 +34,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     TextView textview;
+    private String[] temp_munzeeIDs;
+    private int countSpecials = 0;
+    private int all = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
     //z9UpxHtDErFMCiPGZCDFRE0qBc3f9jD9ZApWn53w
     public void GetCount(View view) {
+        countSpecials = 0;
+        all = 0;
         MakeGPSView();
         // example BoundingBox
         // POST https://api.munzee.com/map/boundingbox/
@@ -141,13 +146,25 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) (findViewById(R.id.tvCountMunzee))).setText("xxx");
         ((TextView) (findViewById(R.id.tvCountSpecial))).setText("yyy");
         PostTask p = new PostTask();
+        p.action = 0;
         p.parametr = requestData2;
         AsyncTask<String, String, String> result = p.execute(null,null,null);
-
-
     }
+
+    public void countSpecial()
+    {
+        if (temp_munzeeIDs != null && temp_munzeeIDs.length > 0)
+            for (String mid:temp_munzeeIDs) {
+                PostTask x = new PostTask();
+                x.action = 1;
+                x.parametr = mid;
+                AsyncTask<String, String, String> result2 = x.execute(null,null,null);
+            }
+    }
+
     private class PostTask extends AsyncTask<String, String, String> {
         public String parametr;
+        private int action;
         private int numberOfMunzees;
         private int numberOfSpecials;
 
@@ -157,12 +174,20 @@ public class MainActivity extends AppCompatActivity {
                 //add data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
                 String token = "KiJvZ85biNSZ7R8bR6BkbSdyvtiWfYv8pHL2HX3g";
+                HttpPost httppost = null;
                 HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("https://api.munzee.com/map/boundingbox/");
-                httppost.setHeader("Authorization", "Bearer " + token);
-                //nameValuePairs.add(new BasicNameValuePair("data", "{\"username\":\"coolant\"}"));
-                nameValuePairs.add(new BasicNameValuePair("data", parametr));
+                if (action == 0) {
+                    httppost = new HttpPost("https://api.munzee.com/map/boundingbox/");
+                    httppost.setHeader("Authorization", "Bearer " + token);
+                    nameValuePairs.add(new BasicNameValuePair("data", parametr));
+                }
+                if (action == 1) {
+                    httppost = new HttpPost("https://api.munzee.com/munzee/");
+                    httppost.setHeader("Authorization", "Bearer " + token);
+                    nameValuePairs.add(new BasicNameValuePair("data", "{\"munzee_id\": " + parametr +", \"closest\":0}"));
+                }
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
                 //execute http post
                 HttpResponse response = httpclient.execute(httppost);
                 String result = new BasicResponseHandler().handleResponse(response);
@@ -181,10 +206,23 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result)
         {
             // todo
-            analyzeResult(result);
-
-            ((TextView) (findViewById(R.id.tvCountMunzee))).setText(String.valueOf(numberOfMunzees));
-            ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(numberOfSpecials));
+            if (action == 0)
+            {
+                analyzeResult(result);
+                ((TextView) (findViewById(R.id.tvCountMunzee))).setText(String.valueOf(numberOfMunzees));
+                countSpecial();
+            }
+            if (action == 1) {
+                if (result.contains("special_good_until"))
+                    countSpecials++;
+                else if (result.contains("\"capture_type_id\":\"505\"")    // unicorn
+                        || result.contains("\"capture_type_id\":\"508\"")  // leprechuan
+                        || result.contains("\"capture_type_id\":\"573\"")   // dragon
+                        || result.contains("\"capture_type_id\":\"521\"")  ) // mystery nomad
+                    countSpecials++;
+                all++;
+                ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(countSpecials) + " / " + String.valueOf(all));
+            }
 
         }
         private void analyzeResult(String result)
@@ -201,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             numberOfMunzees = jednotliveMunzee.length;
+            temp_munzeeIDs = new String[numberOfMunzees];
             for (int i = 0; i < jednotliveMunzee.length; i++)
             {
                 /*
@@ -216,7 +255,9 @@ public class MainActivity extends AppCompatActivity {
                 String MID = jednotliveMunzee[i].substring(startMID, endMID);
                 String ID = MID.split("\\:")[1];
                 ID = ID.trim().replaceAll("\"", "");
+                temp_munzeeIDs[i] = ID;
                 // todo -> volani funkce na zjisteni jestli hosti specialku
+                // "special_good_until":1488046467
             }
 
         }
