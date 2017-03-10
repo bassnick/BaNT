@@ -126,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
+        //ilat = 49.47351997;
+        //iLong = 17.9734022;
 
         double lat1 = ilat - 0.0058578;
         double lat2 = ilat + 0.0058578;
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         double lng2 = iLong + 0.0096317;
 
         String requestData1 = "data";
-        String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id,friendly_name,latitude,longitude,original_pin_image,creator_username\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
+        String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
 
         //0.0058578NS
         //0,0096317WE
@@ -205,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result)
         {
-            // todo
             if (action == 0)
             {
                 analyzeResult(result);
@@ -214,11 +215,6 @@ public class MainActivity extends AppCompatActivity {
             }
             if (action == 1) {
                 if (result.contains("special_good_until"))
-                    countSpecials++;
-                else if (result.contains("\"capture_type_id\":\"505\"")    // unicorn
-                        || result.contains("\"capture_type_id\":\"508\"")  // leprechuan
-                        || result.contains("\"capture_type_id\":\"573\"")   // dragon
-                        || result.contains("\"capture_type_id\":\"521\"")  ) // mystery nomad
                     countSpecials++;
                 all++;
                 ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(countSpecials) + " / " + String.valueOf(all));
@@ -242,22 +238,9 @@ public class MainActivity extends AppCompatActivity {
             temp_munzeeIDs = new String[numberOfMunzees];
             for (int i = 0; i < jednotliveMunzee.length; i++)
             {
-                /*
-                "munzee_id": "830366",
-                "friendly_name": "Schönherrpark #3",
-                "latitude": "50.8497691154465",
-                "longitude": "12.9200291633602",
-                "original_pin_image": "http://static.munzee.com/images/pins/munzee.png",
-                "creator_username": "BHaus"
-                */
-                int startMID = jednotliveMunzee[i].indexOf("\"munzee_id\":");
-                int endMID = jednotliveMunzee[i].indexOf(",", startMID);
-                String MID = jednotliveMunzee[i].substring(startMID, endMID);
-                String ID = MID.split("\\:")[1];
+                String ID = jednotliveMunzee[i].split("\\:")[1];
                 ID = ID.trim().replaceAll("\"", "");
                 temp_munzeeIDs[i] = ID;
-                // todo -> volani funkce na zjisteni jestli hosti specialku
-                // "special_good_until":1488046467
             }
 
         }
