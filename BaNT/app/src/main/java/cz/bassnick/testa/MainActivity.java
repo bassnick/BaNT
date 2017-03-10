@@ -28,7 +28,10 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -214,13 +217,30 @@ public class MainActivity extends AppCompatActivity {
                 countSpecial();
             }
             if (action == 1) {
-                if (result.contains("special_good_until"))
-                    countSpecials++;
-                all++;
+                analyzeOrDisplayMunzee(result);
                 ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(countSpecials) + " / " + String.valueOf(all));
             }
 
         }
+
+        private void analyzeOrDisplayMunzee(String result) {
+            if (result.contains("special_good_until"))
+            {
+                countSpecials++;
+                int startUntil = result.indexOf("\"special_good_until\":");
+                int endUntil = result.indexOf(",", startUntil);
+                String stimestamp = result.substring(startUntil, endUntil).split("\\:")[1].trim().replace("\"","");
+                long timestamp = Long.parseLong(stimestamp);
+                Date time = new Date(timestamp*1000);
+                DateFormat df = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
+                String datumexpirace = df.format(time);
+                TextView where1 =  (TextView)findViewById(R.id.where1);
+                where1.setText(datumexpirace);
+            }
+            all++;
+
+        }
+
         private void analyzeResult(String result)
         {
             numberOfMunzees = 0;
