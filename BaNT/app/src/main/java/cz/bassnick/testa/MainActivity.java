@@ -1,5 +1,8 @@
 package cz.bassnick.testa;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
@@ -8,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.Activity;
 import android.view.Menu;
 import android.widget.TextView;
+import android.net.Uri;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -27,7 +32,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -129,8 +139,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        //ilat = 49.47351997;
-        //iLong = 17.9734022;
+        ilat = 49.47627407;
+        iLong = 18.04196164;
 
         double lat1 = ilat - 0.0058578;
         double lat2 = ilat + 0.0058578;
@@ -165,6 +175,53 @@ public class MainActivity extends AppCompatActivity {
                 x.parametr = mid;
                 AsyncTask<String, String, String> result2 = x.execute(null,null,null);
             }
+    }
+
+    class DownloadImage extends AsyncTask<String, String, String> {
+
+        private Exception exception;
+        private android.graphics.Bitmap bitmapStream;
+
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                //URL url = new URL(urls[0]);
+                String pinTest = "https://munzee.global.ssl.fastly.net/images/pins/faun.png";
+
+                //imageView1 = (ImageView) findViewById(R.id.image1);
+
+
+                URL url = null;
+                try {
+                    url = new URL(pinTest);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+
+                //imageView1 = (ImageView) findViewById(R.id.image1);
+                // imageView1.setImageURI(android.net.Uri.parse(url.toString()));
+
+                try {
+                    bitmapStream = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                  //  imageView1.setImageBitmap(is);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+
+
+            } catch (Exception e) {
+                this.exception = e;
+
+                return null;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String icon) {
+            ImageView imageView1 = (ImageView) findViewById(R.id.image1);
+            imageView1.setImageBitmap(bitmapStream);
+        }
     }
 
     private class PostTask extends AsyncTask<String, String, String> {
@@ -224,21 +281,27 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void analyzeOrDisplayMunzee(String result) {
-            if (result.contains("special_good_until"))
-            {
+            int startUntil = result.indexOf("\"special_good_until\":");
+            if (startUntil > 0) {
                 countSpecials++;
-                int startUntil = result.indexOf("\"special_good_until\":");
                 int endUntil = result.indexOf(",", startUntil);
-                String stimestamp = result.substring(startUntil, endUntil).split("\\:")[1].trim().replace("\"","");
+                String stimestamp = result.substring(startUntil, endUntil).split("\\:")[1].trim().replace("\"", "");
                 long timestamp = Long.parseLong(stimestamp);
-                Date time = new Date(timestamp*1000);
+                Date time = new Date(timestamp * 1000);
                 DateFormat df = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
                 String datumexpirace = df.format(time);
-                TextView where1 =  (TextView)findViewById(R.id.where1);
+                TextView where1 = (TextView) findViewById(R.id.where1);
                 where1.setText(datumexpirace);
-            }
-            all++;
 
+                int startPinIcon = result.indexOf("\"pin_icon\":");
+                int endPinIcon = result.indexOf(",", startPinIcon);
+                String pinIconUrl = result.substring(startPinIcon + "\"pin_icon\":".length(), endPinIcon).trim().replace("\"", "");
+
+                DownloadImage di = new DownloadImage();
+                AsyncTask<String, String, String> resultImage = di.execute(null,null,null);
+                all++;
+
+            }
         }
 
         private void analyzeResult(String result)
