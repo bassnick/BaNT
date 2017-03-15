@@ -139,13 +139,13 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        ilat = 49.47627407;
-        iLong = 18.04196164;
+        ilat = 49.482634999999995;
+        iLong = 17.960471666666667;
 
-        double lat1 = ilat - 0.0058578;
-        double lat2 = ilat + 0.0058578;
-        double lng1 = iLong - 0.0096317;
-        double lng2 = iLong + 0.0096317;
+        double lat1 = ilat - 0.0009;//0.0058578;
+        double lat2 = ilat + 0.0009;//0.0058578;
+        double lng1 = iLong - 0.0009;//0.0096317;
+        double lng2 = iLong + 0.0009;//0.0096317;
 
         String requestData1 = "data";
         String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
@@ -181,13 +181,14 @@ public class MainActivity extends AppCompatActivity {
 
         private Exception exception;
         private android.graphics.Bitmap bitmapStream;
+        private String pinIconUrl;
 
         @Override
         protected String doInBackground(String... urls) {
             try {
                 //URL url = new URL(urls[0]);
-                String pinTest = "https://munzee.global.ssl.fastly.net/images/pins/faun.png";
-
+                //String pinTest = "https://munzee.global.ssl.fastly.net/images/pins/faun.png";
+                String pinTest = pinIconUrl.replace("\\", "");
                 //imageView1 = (ImageView) findViewById(R.id.image1);
 
 
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 //add data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                String token = "KiJvZ85biNSZ7R8bR6BkbSdyvtiWfYv8pHL2HX3g";
+                String token = "q08DOr6ugEVbmC50pPID3E1JTCV1urjWYZ3sFAe5";
                 HttpPost httppost = null;
                 HttpClient httpclient = new DefaultHttpClient();
                 if (action == 0) {
@@ -298,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
                 String pinIconUrl = result.substring(startPinIcon + "\"pin_icon\":".length(), endPinIcon).trim().replace("\"", "");
 
                 DownloadImage di = new DownloadImage();
+                di.pinIconUrl = pinIconUrl;
                 AsyncTask<String, String, String> resultImage = di.execute(null,null,null);
                 all++;
 
