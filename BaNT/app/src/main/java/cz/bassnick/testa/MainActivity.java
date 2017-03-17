@@ -7,11 +7,13 @@ import android.location.Address;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.support.annotation.IntegerRes;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.app.Activity;
 import android.view.Menu;
@@ -41,8 +43,12 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private String[] temp_munzeeIDs;
     private int countSpecials = 0;
     private int all = 0;
+    public CustomList<String> prgmNameList = new CustomList<String>();
+    public CustomList<android.graphics.Bitmap> prgmImages = new CustomList<Bitmap>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     //z9UpxHtDErFMCiPGZCDFRE0qBc3f9jD9ZApWn53w
     public void GetCount(View view) {
         countSpecials = 0;
@@ -139,13 +148,13 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        ilat = 49.482634999999995;
-        iLong = 17.960471666666667;
+        ilat = 49.4649000093341;
+        iLong = 18.083184119314;
 
-        double lat1 = ilat - 0.0009;//0.0058578;
-        double lat2 = ilat + 0.0009;//0.0058578;
-        double lng1 = iLong - 0.0009;//0.0096317;
-        double lng2 = iLong + 0.0009;//0.0096317;
+        double lat1 = ilat -/* 0.0009;*/0.0058578;
+        double lat2 = ilat + /*0.0009;*/0.0058578;
+        double lng1 = iLong -/* 0.0009;*/0.0096317;
+        double lng2 = iLong +/* 0.0009;*/0.0096317;
 
         String requestData1 = "data";
         String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
@@ -164,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
         p.action = 0;
         p.parametr = requestData2;
         AsyncTask<String, String, String> result = p.execute(null,null,null);
+
+
     }
 
     public void countSpecial()
@@ -177,11 +188,30 @@ public class MainActivity extends AppCompatActivity {
             }
     }
 
+    public void ShowFounded() {
+        ListView lv = (ListView) findViewById(R.id.listView);
+        if (prgmNameList != null && prgmImages != null)
+        {
+            String[] names = new String[prgmNameList.size];
+            android.graphics.Bitmap[] images = new Bitmap[prgmImages.size];
+            for (int i = 0; i < prgmNameList.size; i++)
+            {
+                names[i] = prgmNameList.get(i);
+            }
+            for (int j = 0; j < prgmImages.size; j++)
+            {
+                images[j] = prgmImages.get(j);
+            }
+            lv.setAdapter(new CustomAdapter(this, names,images));
+        }
+    }
+
     class DownloadImage extends AsyncTask<String, String, String> {
 
         private Exception exception;
         private android.graphics.Bitmap bitmapStream;
         private String pinIconUrl;
+        private String description;
 
         @Override
         protected String doInBackground(String... urls) {
@@ -220,8 +250,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String icon) {
-            ImageView imageView1 = (ImageView) findViewById(R.id.image1);
-            imageView1.setImageBitmap(bitmapStream);
+            MainActivity.this.prgmImages.add(bitmapStream);
+            MainActivity.this.prgmNameList.add(description);
+            MainActivity.this.ShowFounded();
+
+            //ImageView imageView1 = (ImageView) findViewById(R.id.image1);
+            //imageView1.setImageBitmap(bitmapStream);
         }
     }
 
@@ -291,8 +325,8 @@ public class MainActivity extends AppCompatActivity {
                 Date time = new Date(timestamp * 1000);
                 DateFormat df = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
                 String datumexpirace = df.format(time);
-                TextView where1 = (TextView) findViewById(R.id.where1);
-                where1.setText(datumexpirace);
+               // TextView where1 = (TextView) findViewById(R.id.where1);
+               // where1.setText(datumexpirace);
 
                 int startPinIcon = result.indexOf("\"pin_icon\":");
                 int endPinIcon = result.indexOf(",", startPinIcon);
@@ -300,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
 
                 DownloadImage di = new DownloadImage();
                 di.pinIconUrl = pinIconUrl;
+                di.description = datumexpirace;
                 AsyncTask<String, String, String> resultImage = di.execute(null,null,null);
                 all++;
 
@@ -331,3 +366,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
