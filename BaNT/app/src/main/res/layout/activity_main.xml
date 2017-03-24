@@ -76,53 +76,33 @@
         <Button
             android:layout_width="346dp"
             android:layout_height="wrap_content"
-            android:text="Zjisti počet munzee / počet speciálek"
+            android:text="Spustit skenování"
             android:id="@+id/btnGetCount"
             android:layout_row="5"
             android:layout_column="0"
             android:onClick="GetCount" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Počet munzee v oblasti +/- 665m"
-            android:id="@+id/textView"
-            android:layout_row="6"
-            android:layout_column="0" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="-"
             android:id="@+id/tvCountMunzee"
-            android:layout_row="7"
+            android:layout_row="6"
             android:layout_column="0" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Počet speciálek v oblasti +/- 665m"
-            android:id="@+id/textView3"
-            android:layout_row="8"
-            android:layout_column="0" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="-"
             android:id="@+id/tvCountSpecial"
-            android:layout_row="9"
+            android:layout_row="7"
             android:layout_column="0" />
         <ListView
             android:id="@+id/listView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_columnSpan="2"
-            android:layout_row="10"
+            android:layout_row="8"
             android:layout_column="0" />
         />
     </GridLayout>

@@ -55,7 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textview;
     private String[] temp_munzeeIDs;
+    private int lastCountSpecials = 0;
     private int countSpecials = 0;
+    private int lastAll = 0;
     private int all = 0;
     public CustomList<String> prgmNameList = new CustomList<String>();
     public CustomList<android.graphics.Bitmap> prgmImages = new CustomList<Bitmap>();
@@ -139,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
 
     //z9UpxHtDErFMCiPGZCDFRE0qBc3f9jD9ZApWn53w
     public void GetCount(View view) {
+        lastCountSpecials = countSpecials;
+        lastAll = all;
         countSpecials = 0;
         all = 0;
         MakeGPSView();
@@ -151,7 +155,8 @@ public class MainActivity extends AppCompatActivity {
         double iLong = Double.parseDouble(tvLong.getText().toString());
         //ilat = 49.4649000093341;
         //iLong = 18.083184119314;
-
+        ilat = 49.47808895192653;
+        iLong = 17.97852884978056;
         double lat1 = ilat -/* 0.0009;*/0.0058578;
         double lat2 = ilat + /*0.0009;*/0.0058578;
         double lng1 = iLong -/* 0.0009;*/0.0096317;
@@ -168,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
         //'data={"munzee_id":100, "closest":1}'
 
 
-        ((TextView) (findViewById(R.id.tvCountMunzee))).setText("xxx");
-        ((TextView) (findViewById(R.id.tvCountSpecial))).setText("yyy");
+        ((TextView) (findViewById(R.id.tvCountMunzee))).setText("-");
+        ((TextView) (findViewById(R.id.tvCountSpecial))).setText("-");
         PostTask p = new PostTask();
         p.action = 0;
         p.parametr = requestData2;
@@ -312,12 +317,14 @@ public class MainActivity extends AppCompatActivity {
             if (action == 0)
             {
                 analyzeResult(result);
-                ((TextView) (findViewById(R.id.tvCountMunzee))).setText(String.valueOf(numberOfMunzees));
+                ((TextView) (findViewById(R.id.tvCountMunzee))).setText(String.valueOf(numberOfMunzees) + " (minule: " + String.valueOf(lastAll)+") munzee v oblasti +-665m.");
+                MainActivity.this.prgmNameList = new CustomList<String>();
+                MainActivity.this.prgmImages = new CustomList<Bitmap>();
                 countSpecial();
             }
             if (action == 1) {
                 analyzeOrDisplayMunzee(result);
-                ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(countSpecials) + " / " + String.valueOf(all));
+                ((TextView) (findViewById(R.id.tvCountSpecial))).setText(String.valueOf(all) + " prozkoumaných munzee.\r\n"+ String.valueOf(countSpecials) + " (minule: " + String.valueOf(lastCountSpecials) +") nalezených speciálek");
             }
 
         }
