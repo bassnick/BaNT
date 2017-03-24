@@ -148,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        ilat = 49.4649000093341;
-        iLong = 18.083184119314;
+        //ilat = 49.4649000093341;
+        //iLong = 18.083184119314;
 
         double lat1 = ilat -/* 0.0009;*/0.0058578;
         double lat2 = ilat + /*0.0009;*/0.0058578;
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 //add data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                String token = "q08DOr6ugEVbmC50pPID3E1JTCV1urjWYZ3sFAe5";
+                String token = "EX6igmDMApYsG6uwYZWxwO5vxWQTFN14OoepK4oW";
                 HttpPost httppost = null;
                 HttpClient httpclient = new DefaultHttpClient();
                 if (action == 0) {
@@ -336,9 +336,8 @@ public class MainActivity extends AppCompatActivity {
                 di.pinIconUrl = pinIconUrl;
                 di.description = datumexpirace;
                 AsyncTask<String, String, String> resultImage = di.execute(null,null,null);
-                all++;
-
             }
+            all++;
         }
 
         private void analyzeResult(String result)
