@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -174,7 +175,13 @@ public class MainActivity extends AppCompatActivity {
         p.parametr = requestData2;
         AsyncTask<String, String, String> result = p.execute(null,null,null);
 
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Button btn = (Button)findViewById(R.id.btnGetCount);
+                btn.performClick();
+            }
+        }, 480000);
     }
 
     public void countSpecial()
