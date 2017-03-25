@@ -24,6 +24,7 @@ public class CustomAdapter extends BaseAdapter{
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
+        if (result == null) return 0;
         return result.length;
     }
 
@@ -47,20 +48,26 @@ public class CustomAdapter extends BaseAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
-        Holder holder=new Holder();
+        Holder holder = new Holder();
         View rowView;
         rowView = inflater.inflate(R.layout.found_list, null);
-        holder.tv=(TextView) rowView.findViewById(R.id.where1);
-        holder.img=(ImageView) rowView.findViewById(R.id.image1);
-        holder.tv.setText(result[position]);
-        holder.img.setImageBitmap(image[position]);
-        rowView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked "+result[position], Toast.LENGTH_LONG).show();
-            }
-        });
+        holder.tv = (TextView) rowView.findViewById(R.id.where1);
+        holder.img = (ImageView) rowView.findViewById(R.id.image1);
+        if (result == null || image == null) {
+            holder = null;
+        } else {
+            holder.tv.setText(result[position]);
+
+            holder.img.setImageBitmap(image[position]);
+
+            rowView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO Auto-generated method stub
+                    Toast.makeText(context, "You Clicked " + result[position], Toast.LENGTH_LONG).show();
+                }
+            });
+        }
         return rowView;
     }
 

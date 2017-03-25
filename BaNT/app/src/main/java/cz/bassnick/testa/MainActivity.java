@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
@@ -53,6 +54,7 @@ import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean timerWorking = false;
     TextView textview;
     private String[] temp_munzeeIDs;
     private int lastCountSpecials = 0;
@@ -62,11 +64,28 @@ public class MainActivity extends AppCompatActivity {
     public CustomList<String> prgmNameList = new CustomList<String>();
     public CustomList<android.graphics.Bitmap> prgmImages = new CustomList<Bitmap>();
 
+    CountDownTimer waitTimer;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //MakeGPSView();
+        waitTimer = new CountDownTimer(480000, 10000) {
+
+            public void onTick(long millisUntilFinished) {
+                //called every 300 milliseconds, which could be used to
+                //send messages or some other action
+            }
+
+            public void onFinish() {
+                Button btn = (Button) findViewById(R.id.btnGetCount);
+                btn.performClick();
+                //After 60000 milliseconds (60 sec) finish current
+                //if you would like to execute something when time finishes
+            }
+        };
 
 
     }
@@ -138,9 +157,21 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void StopTimer(View view)
+    {
+        waitTimer.cancel();
+        timerWorking = false;
+        Button b = (Button)findViewById(R.id.btnStopTimer);
+        b.setText("Časovač zastaven");
+    }
 
     //z9UpxHtDErFMCiPGZCDFRE0qBc3f9jD9ZApWn53w
     public void GetCount(View view) {
+        if (timerWorking)
+        {
+            waitTimer.cancel();
+            timerWorking = false;
+        }
         lastCountSpecials = countSpecials;
         lastAll = all;
         countSpecials = 0;
@@ -153,10 +184,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        //ilat = 49.4649000093341;
-        //iLong = 18.083184119314;
-        ilat = 49.47808895192653;
-        iLong = 17.97852884978056;
+        //ilat = 49.58962591112738;
+        //iLong = 18.152138851583004;
         double lat1 = ilat -/* 0.0009;*/0.0058578;
         double lat2 = ilat + /*0.0009;*/0.0058578;
         double lng1 = iLong -/* 0.0009;*/0.0096317;
@@ -180,13 +209,21 @@ public class MainActivity extends AppCompatActivity {
         p.parametr = requestData2;
         AsyncTask<String, String, String> result = p.execute(null,null,null);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Button btn = (Button)findViewById(R.id.btnGetCount);
-                btn.performClick();
-            }
-        }, 480000);
+        if (!timerWorking) {
+            timerWorking = true;
+            waitTimer.start();
+            Button b = (Button)findViewById(R.id.btnStopTimer);
+            b.setText("Zastavit časovač");
+
+
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Button btn = (Button) findViewById(R.id.btnGetCount);
+//                    btn.performClick();
+//                }
+//            }, 480000);
+        }
     }
 
     public void countSpecial()
@@ -215,6 +252,12 @@ public class MainActivity extends AppCompatActivity {
                 images[j] = prgmImages.get(j);
             }
             lv.setAdapter(new CustomAdapter(this, names,images));
+            if (prgmNameList.size == 0 || prgmImages.size == 0)
+                lv.setAdapter(new CustomAdapter(this, null, null));
+        }
+        else
+        {
+            lv.setAdapter(new CustomAdapter(this, null, null));
         }
     }
 
@@ -320,6 +363,8 @@ public class MainActivity extends AppCompatActivity {
                 ((TextView) (findViewById(R.id.tvCountMunzee))).setText(String.valueOf(numberOfMunzees) + " (minule: " + String.valueOf(lastAll)+") munzee v oblasti +-665m.");
                 MainActivity.this.prgmNameList = new CustomList<String>();
                 MainActivity.this.prgmImages = new CustomList<Bitmap>();
+                ShowFounded();
+                //ListView lv = (ListView) findViewById(R.id.listView);
                 countSpecial();
             }
             if (action == 1) {
