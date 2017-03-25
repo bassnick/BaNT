@@ -2,6 +2,7 @@ package cz.bassnick.testa;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.net.http.HttpResponseCache;
@@ -165,8 +166,24 @@ public class MainActivity extends AppCompatActivity {
         b.setText("Časovač zastaven");
     }
 
+    private void setColorOfSpecials(int bcolor, int fcolor)
+    {
+        TextView tv = (TextView)findViewById(R.id.tvCountSpecial);
+        tv.setBackgroundColor(bcolor);
+        tv.setTextColor(fcolor);
+    }
     //z9UpxHtDErFMCiPGZCDFRE0qBc3f9jD9ZApWn53w
     public void GetCount(View view) {
+        if (countSpecials > 0)
+        {
+            int warning = getResources().getColor(R.color.colorWarning);
+            setColorOfSpecials(warning, Color.BLACK);
+        }
+        else
+        {
+            int common = getResources().getColor(R.color.colorPrimary);
+            setColorOfSpecials(common, Color.WHITE);
+        }
         if (timerWorking)
         {
             waitTimer.cancel();
@@ -378,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
             int startUntil = result.indexOf("\"special_good_until\":");
             if (startUntil > 0) {
                 countSpecials++;
+
                 int endUntil = result.indexOf(",", startUntil);
                 String stimestamp = result.substring(startUntil, endUntil).split("\\:")[1].trim().replace("\"", "");
                 long timestamp = Long.parseLong(stimestamp);
@@ -387,13 +405,27 @@ public class MainActivity extends AppCompatActivity {
                // TextView where1 = (TextView) findViewById(R.id.where1);
                // where1.setText(datumexpirace);
 
+                int startUrl = result.indexOf("\"url\":");
+                int endUrl = result.indexOf(",", startUrl);
+                String[] castiUrl =  result.substring(startUrl, endUrl).split(":")[1].replace("\"", "").replace(":", "").trim().split("/");
+                String creator = castiUrl[2].replace("\\", "");
+                String numberOfCreatorsMunzee= castiUrl[3].replace("\\", "");
+
+                int startName = result.indexOf("\"friendly_name\":");
+                int endName = result.indexOf(",", startName);
+                String name = result.substring(startName, endName).split(":")[1].replace("\"", "").replace(":", "").trim();
+
                 int startPinIcon = result.indexOf("\"pin_icon\":");
                 int endPinIcon = result.indexOf(",", startPinIcon);
                 String pinIconUrl = result.substring(startPinIcon + "\"pin_icon\":".length(), endPinIcon).trim().replace("\"", "");
 
+                setColorOfSpecials(getResources().getColor(R.color.colorFound), Color.BLACK);
+
                 DownloadImage di = new DownloadImage();
                 di.pinIconUrl = pinIconUrl;
-                di.description = datumexpirace;
+                di.description = datumexpirace + "\r\n" + creator + "#" + numberOfCreatorsMunzee + "\r\n" + name;
+
+
                 AsyncTask<String, String, String> resultImage = di.execute(null,null,null);
             }
             all++;

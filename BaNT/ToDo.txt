@@ -1,5 +1,2 @@
-1) tlačítko na ruční vyvolání skenu, aby se vypnul časovač
-2) přestylování
----------------
-3) notifikace
-4) registrace tokenu
+1) notifikace
+2) registrace tokenu
