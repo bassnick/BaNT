@@ -201,6 +201,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
+        //ilat = 49.59659394020561;
+        //iLong = 18.106088005006313;
         double lat1 = ilat -/* 0.0009;*/0.0058578;
         double lat2 = ilat + /*0.0009;*/0.0058578;
         double lng1 = iLong - /*0.0009;*/0.0096317;
@@ -347,7 +349,12 @@ public class MainActivity extends AppCompatActivity {
                 char c = (char)temp;
                 result = result + Character.toString(c);
             }
+            else
+            {
+                result = result + description.substring(indexOfEndU);
+            }
         }
+
 
         return result;
 
