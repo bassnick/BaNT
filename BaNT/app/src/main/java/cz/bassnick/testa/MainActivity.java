@@ -201,12 +201,12 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        //ilat = 49.58962591112738;
-        //iLong = 18.152138851583004;
-        double lat1 = ilat -/* 0.0009;*/0.0058578;
-        double lat2 = ilat + /*0.0009;*/0.0058578;
-        double lng1 = iLong -/* 0.0009;*/0.0096317;
-        double lng2 = iLong +/* 0.0009;*/0.0096317;
+        ilat = 49.59659394020561;
+        iLong =  18.106088005006313;
+        double lat1 = ilat - 0.0009;//0.0058578;
+        double lat2 = ilat + 0.0009;//0.0058578;
+        double lng1 = iLong - 0.0009;//0.0096317;
+        double lng2 = iLong + 0.0009;//0.0096317;
 
         String requestData1 = "data";
         String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
@@ -323,12 +323,36 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String icon) {
             MainActivity.this.prgmImages.add(bitmapStream);
+            description = fromUnicodeToString(description);
             MainActivity.this.prgmNameList.add(description);
             MainActivity.this.ShowFounded();
 
             //ImageView imageView1 = (ImageView) findViewById(R.id.image1);
             //imageView1.setImageBitmap(bitmapStream);
         }
+    }
+
+    private String fromUnicodeToString(String description) {
+        String result = "";
+
+        int indexOfStartU = 0;
+        int indexOfEndU = 0;
+        while (indexOfStartU != -1)
+        {
+            indexOfStartU = description.indexOf("\\u",indexOfEndU);
+            if (indexOfStartU > -1)
+            {
+                result = result + description.substring(indexOfEndU, indexOfStartU);
+                indexOfEndU = indexOfStartU + 6;
+                int temp =Integer.parseInt(description.substring(indexOfStartU + 2,indexOfEndU), 16);
+
+                char c = (char)temp;
+                result = result + Character.toString(c);
+            }
+        }
+
+        return result;
+
     }
 
     private class PostTask extends AsyncTask<String, String, String> {
@@ -423,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
 
                 DownloadImage di = new DownloadImage();
                 di.pinIconUrl = pinIconUrl;
-                di.description = datumexpirace + "\r\n" + creator + "#" + numberOfCreatorsMunzee + "\r\n" + name;
+                di.description = datumexpirace + "\r\n" + creator + " #" + numberOfCreatorsMunzee + "\r\n" + name;
 
 
                 AsyncTask<String, String, String> resultImage = di.execute(null,null,null);
