@@ -201,12 +201,10 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        ilat = 49.59659394020561;
-        iLong =  18.106088005006313;
-        double lat1 = ilat - 0.0009;//0.0058578;
-        double lat2 = ilat + 0.0009;//0.0058578;
-        double lng1 = iLong - 0.0009;//0.0096317;
-        double lng2 = iLong + 0.0009;//0.0096317;
+        double lat1 = ilat -/* 0.0009;*/0.0058578;
+        double lat2 = ilat + /*0.0009;*/0.0058578;
+        double lng1 = iLong - /*0.0009;*/0.0096317;
+        double lng2 = iLong + /*0.0009;*/0.0096317;
 
         String requestData1 = "data";
         String requestData2 = "{\"limit\":999,\"fields\":\"munzee_id\",\"points\":{\"box1\":{\"timestamp\": 0,\"lat2\":" + String.valueOf(lat2).replace(',', '.') + ",\"lng1\":" + String.valueOf(lng1).replace(',', '.') + ",\"lng2\":" +String.valueOf(lng2).replace(',', '.') + ",\"lat1\":" + String.valueOf(lat1).replace(',', '.') + "}}}";
