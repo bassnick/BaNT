@@ -1,10 +1,18 @@
 package cz.bassnick.testa;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
@@ -71,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /* TODO Orient
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        */
         setContentView(R.layout.activity_main);
         //MakeGPSView();
         waitTimer = new CountDownTimer(480000, 10000) {
@@ -201,8 +214,6 @@ public class MainActivity extends AppCompatActivity {
         TextView tvLong = (TextView) findViewById(R.id.tvLong);
         double ilat = Double.parseDouble(tvLat.getText().toString());
         double iLong = Double.parseDouble(tvLong.getText().toString());
-        //ilat = 49.59659394020561;
-        //iLong = 18.106088005006313;
         double lat1 = ilat -/* 0.0009;*/0.0058578;
         double lat2 = ilat + /*0.0009;*/0.0058578;
         double lng1 = iLong - /*0.0009;*/0.0096317;
@@ -263,6 +274,11 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < prgmNameList.size; i++)
             {
                 names[i] = prgmNameList.get(i);
+                notif(i, prgmNameList.get(i));
+            }
+            if (prgmNameList.size > 0)
+            {
+                sound();
             }
             for (int j = 0; j < prgmImages.size; j++)
             {
@@ -276,6 +292,41 @@ public class MainActivity extends AppCompatActivity {
         {
             lv.setAdapter(new CustomAdapter(this, null, null));
         }
+    }
+
+    private void sound()
+    {
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void notif(int poradi, String text)
+    {
+//We get a reference to the NotificationManager
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String MyText = "BaNT";
+        Notification mNotification = new Notification(R.mipmap.ic_launcher, MyText, System.currentTimeMillis() );
+        //The three parameters are: 1. an icon, 2. a title, 3. time when the notification appears
+
+        String MyNotificationTitle = "BaNT";
+        String MyNotificationText  = text;
+
+        Intent MyIntent = new Intent(Intent.ACTION_VIEW);
+        PendingIntent StartIntent = PendingIntent.getActivity(getApplicationContext(),0,MyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        //A PendingIntent will be fired when the notification is clicked. The FLAG_CANCEL_CURRENT flag cancels the pendingintent
+
+        mNotification.setLatestEventInfo(getApplicationContext(), MyNotificationTitle, MyNotificationText, StartIntent);
+
+        int NOTIFICATION_ID = poradi + 1;
+        notificationManager.notify(NOTIFICATION_ID , mNotification);
+        //We are passing the notification to the NotificationManager with a unique id.
+
     }
 
     class DownloadImage extends AsyncTask<String, String, String> {
