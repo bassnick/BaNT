@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 //add data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                String token = "NPKn4vMXBBZfZchmwYoF1JMpIKACCTMeA8MomZxU";
+                String token = "lAthP25aQcTzRkVEKxe6F2mQ1lCXqoP55Q6X4vhP";
                 HttpPost httppost = null;
                 HttpClient httpclient = new DefaultHttpClient();
                 if (action == 0) {
