@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -422,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 //add data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                String token = "lAthP25aQcTzRkVEKxe6F2mQ1lCXqoP55Q6X4vhP";
+                String token = "X9IAwzIrWBaneF64BBSeIwFRJ8am87Jeur1KQQxF";
                 HttpPost httppost = null;
                 HttpClient httpclient = new DefaultHttpClient();
                 if (action == 0) {
@@ -482,6 +483,12 @@ public class MainActivity extends AppCompatActivity {
                 Date time = new Date(timestamp * 1000);
                 DateFormat df = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
                 String datumexpirace = df.format(time);
+                Date now = new Date(System.currentTimeMillis());
+                if (timestamp * 1000 <= System.currentTimeMillis()) {
+                    countSpecials--;
+                    all++;
+                    return;
+                }
                // TextView where1 = (TextView) findViewById(R.id.where1);
                // where1.setText(datumexpirace);
 
